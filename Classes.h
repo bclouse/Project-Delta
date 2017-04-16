@@ -6,34 +6,32 @@
 #include <random>
 #include <iomanip>
 #include <cmath>
-// #include "LY_NN.h"
+#include "LY_NN.h"
 
 using namespace std;
 
-#define ZERO_TO_ONE (float)rand()/RAND_MAX
+#define ZERO_TO_ONE (double)rand()/RAND_MAX
 #define RADIANS (double)3.1415926535897/180
+#define TIME 0.2
+#define SIZE 200
 
 #ifndef CLASSES_H
 #define CLASSES_H
 
 //===============================
-//	Boat Struct
-//===============================
-
-struct Boat {
-	float x;
-	float y;
-	float theta;
-	float omega;
-};
-
-//===============================
 //	EA Class
 //===============================
 
-class EA {
+class Evolution {
 private:
+	vector<vector<double>> weights;	//[-1,1]
+	vector<double> fitness;
+	int w;	//Number of weights
+	int p;	//Number of policies
 public:
+	void init(int,int);
+	void evaluate();
+
 };
 
 //===============================
@@ -42,8 +40,28 @@ public:
 
 class Simulation {
 private:
+	double gx, gy;
+	double x, y;
+	double theta, omega;
+	double v;
+	Evolution EA;
+	//neural_network NN;
 public:
+	Simulation (int,int);
+	// Simulation (neural_network,int,int);
+	bool simulate(double);
+	vector<double> update_input();
+	void log(bool); 
 };
+
+// class Simulation {
+// private:
+// 	double velocity;
+
+// public:
+// 	Simulation (double);
+// 	void run(Boat,)
+// };
 
 //===============================
 //	Functions
