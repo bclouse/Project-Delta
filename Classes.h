@@ -10,8 +10,8 @@
 
 using namespace std;
 
-#define ZERO_TO_ONE (double)rand()/RAND_MAX
-#define RADIANS (double)3.1415926535897/180
+#define ZERO_TO_ONE ((double)rand()/RAND_MAX)
+#define RADIANS ((double)3.1415926535897/180)
 #define TIME 0.2
 #define SIZE 200
 
@@ -43,15 +43,17 @@ private:
 	double gx, gy;
 	double x, y;
 	double theta, omega;
+	double beta;			//pitch that the boat needs to be at to go directly to the goal
 	double v;
 	Evolution EA;
 	//neural_network NN;
 public:
 	Simulation (int,int);
 	// Simulation (neural_network,int,int);
-	bool simulate(double);
+	int simulate(double);
 	vector<double> update_input();
 	void log(bool); 
+	void calc_beta();
 };
 
 // class Simulation {

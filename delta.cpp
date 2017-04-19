@@ -17,20 +17,28 @@ using namespace std;
 
 int main() {
 	bool first = true;
-	double u = -2.5;
-	int iter;
+	double u = 0;
+	int iter = 0;
+	int state = 0;
+	//neural_network NN;
 	Simulation world (1,SIZE);
 
-	while (world.simulate(u) && iter < 1000) {
+	state = world.simulate(u);
+	while ((state == 0) && (iter < 1000)) {
 		// if (i < 100) {
 			// u += 0.1;	
 		// } else {
 		// 	u -= 0.1;
 		// }
+		world.calc_beta();
 		world.log(first);
 		if (first) first = false;
 		iter++;
+		state = world.simulate(u);
+		// cout << state << '\t';
 	}
+	if (state == 1) cout << "\nOut of bounds\n";
+	else if (state == 2) cout << "\nFound goal\n";
 
 	return 0;
 }
