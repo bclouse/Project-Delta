@@ -18,27 +18,33 @@ using namespace std;
 int main() {
 	bool first = true;
 	double u = 0;
-	int iter = 0;
-	int state = 0;
-	//neural_network NN;
-	Simulation world (1,SIZE);
+	int wt;
+	int pop = 6;
+	int n = 1;
+	srand(time(NULL));
+	
+	neural_network NN;
+	NN.setup(4,5,1);
+	NN.set_in_min_max(0.0,(double)SIZE);
+	NN.set_in_min_max(0.0,(double)SIZE);
+	NN.set_in_min_max(0.0,360.0);
+	NN.set_in_min_max(0.0,360.0);
+	NN.set_out_min_max(-15.0,15.0);
+	wt = NN.get_number_of_weights();
+	// cout << wt << "\n\n";
 
-	state = world.simulate(u);
-	while ((state == 0) && (iter < 1000)) {
-		// if (i < 100) {
-			// u += 0.1;	
-		// } else {
-		// 	u -= 0.1;
-		// }
-		world.calc_beta();
-		world.log(first);
-		if (first) first = false;
-		iter++;
-		state = world.simulate(u);
-		// cout << state << '\t';
+	Evolution EA;	
+	EA.init(wt,pop);
+
+	Simulation world(NN,EA);
+
+	Boat b;
+	b.x = SIZE/4;	b.y = b.x;
+	b.theta = 0;	b.omega = 0;
+
+	for (int i = 0; i < n; i++) {
+		world.run(b);
 	}
-	if (state == 1) cout << "\nOut of bounds\n";
-	else if (state == 2) cout << "\nFound goal\n";
 
 	return 0;
 }

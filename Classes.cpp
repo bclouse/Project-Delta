@@ -9,6 +9,8 @@ void Evolution::init (int wt, int pop) {
 	p = pop;
 	vector<double> dummy;
 
+	if (p%2 != 0) p++;
+
 	for (int i = 0; i < p; i++) {
 		dummy.clear();
 		for (int j = 0; j < w; j++) {
@@ -16,60 +18,112 @@ void Evolution::init (int wt, int pop) {
 		}
 		weights.push_back(dummy);
 	}
+	change = (int)sqrt(w);
 }
 
-void Evolution::evaluate() {
+void Evolution::down_select() {
 
 }
 
+void Evolution::repopulate() {
+
+}
+
+void Evolution::mutate(int index) {
+
+}
+
+void Evolution::give_fitness(vector<double> input) {
+	fitness = input;
+}
+
+vector<double> Evolution::get_weights(int n) {
+	return weights[n];
+}
+
+int Evolution::population() {
+	return (int) weights.size();
+}
 
 //===============================
 //	Simulation Class
 //===============================
 
-Simulation::Simulation(int pop, int size) {
-	Evolution dummy;
-	dummy.init(1,pop);
-	EA = dummy;
-	gx = size/2; 	gy = size/2;
-	x = size/4; 	y = size/4*3;
+Simulation::Simulation(neural_network nn, Evolution ea) {
+	EA = ea;
+	NN = nn;
+	gx = SIZE/2; 	gy = SIZE/2;
+	x = SIZE/4; 	y = SIZE/4*3;
 	theta = 0; 		omega = 0;
 	v = 3;
+
 }
 
-// Simulation::Simulation(neural_network nn, int pop, int size) {
-// 	NN = nn;
-// 	int w = NN.get_number_of_weights();
-// 	Evolution dummy;
-// 	dummy.init(w,pop);
-// 	EA = dummy;
-// 	gx = size/2; 	gy = size/2;
-// 	x = size/4; 	y = size/4;
-// 	theta = 0; 		omega = 0;
-// 	v = 3;
-// }
+void Simulation::run(Boat start) {
+	double min = dist(x,y,gx,gy);
+	double distance = min;
+	double u;
+	double time;
+	double fit;
+	int n = EA.population();
+	bool first = true;
+	vector<double> w;
 
-int Simulation::simulate(double u) {
-	int state = 0;
-	double distance = 0;
+	fitness.clear();
+	for (int i = 0; i < n; i++) {
+		x = start.x;			y = start.y;
+		theta = start.theta;	omega = start.omega;
+		time = 0;
+		fit = 0;
+		w = EA.get_weights(i);
+		do {
+			update_input();
+			NN.set_vector_input(input);
+			NN.set_weights(w,true);
+			NN.execute();
+			u = NN.get_output(0);
+			simulate(u);
+			calc_beta();
+			distance = dist(x,y,gx,gy);
+			if (min > distance) min = distance;
+			time += TIME;
+			if (i == 0) {
+				log(first);
+				if (first) first = false;
+			}
+		} while (in_bounds() && distance > 2.5 && time < 100);
+		fit = min+time;
+		if (!in_bounds())	{
+			fit += 100;
+			//cout << "OUTSIDE ";
+		} //else if (distance <= 2.5) {
+		// 	cout << "FOUND   ";
+		// } else {
+		// 	cout << "INSIDE  ";
+		// }
+		cout << fit << endl;
+		fitness.push_back(fit);
+	}
+	// assert(n == fitness.size());
+	EA.give_fitness(fitness);
+	EA.down_select();
+	EA.repopulate();
+}
 
-	// vector<double> input = update_input();
-	// NN.set_vector_input(input);
-	// NN.execute();
-	// u = NN.get_output(0);
+void Simulation::simulate(double u) {
 
 	x += v*cos(theta*RADIANS)*TIME;
 	y += v*sin(theta*RADIANS)*TIME;
 	theta += omega*TIME;
-	// omega += (u-omega)*TIME/5.0;	//the "5.0" it "T"
+	omega += (u-omega)*TIME/5.0;	//the "5.0" it "T"
 
-	distance = sqrt(pow(x-gx,2)+pow(y-gy,2));
+	// distance = sqrt(pow(x-gx,2)+pow(y-gy,2));
 
-	if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
-		state = 1;
-	} else if (distance <= 2.5) {
-		state = 2;
-	}
+	// if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
+	// 	state = 1;
+	// } else if (distance <= 2.5) {
+	// 	state = 2;
+	// }
 	while (theta < 0 || theta >= 360) {
 		if (theta < 0) {
 			theta += 360;
@@ -82,17 +136,57 @@ int Simulation::simulate(double u) {
 	} else if (omega < -15) {
 		omega = -15;
 	}
-
-	return state;
 }
 
-vector<double> Simulation::update_input() {
-	vector<double> input;
+// int Simulation::simulate(double u) {
+// 	int state = 0;
+// 	double distance = 0;
+
+// 	update_input();
+// 	NN.set_input_vector(input);
+// 	NN.execute();
+// 	u = NN.get_output(0);
+
+// 	x += v*cos(theta*RADIANS)*TIME;
+// 	y += v*sin(theta*RADIANS)*TIME;
+// 	theta += omega*TIME;
+// 	// omega += (u-omega)*TIME/5.0;	//the "5.0" it "T"
+
+// 	distance = sqrt(pow(x-gx,2)+pow(y-gy,2));
+
+// 	if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
+// 		state = 1;
+// 	} else if (distance <= 2.5) {
+// 		state = 2;
+// 	}
+// 	while (theta < 0 || theta >= 360) {
+// 		if (theta < 0) {
+// 			theta += 360;
+// 		} else if (theta >= 360) {
+// 			theta -= 360;
+// 		}
+// 	}
+// 	if (omega > 15) {
+// 		omega = 15;
+// 	} else if (omega < -15) {
+// 		omega = -15;
+// 	}
+
+// 	return state;
+// }
+
+void Simulation::update_input() {
+	input.clear();
+	double stray = beta-theta;
+
+	if (stray < 0) {
+		stray += 360;
+	}
 
 	input.push_back(x);
 	input.push_back(y);
-
-	return input;
+	input.push_back(stray);
+	input.push_back(omega);
 }
 
 void Simulation::calc_beta() {
@@ -122,7 +216,17 @@ void Simulation::log(bool first) {
 	fclose(fp);
 }
 
+bool Simulation::in_bounds() {
+	if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
+		return false;
+	}
+	return true;
+}
+
 //===============================
 //	Functions
 //===============================
 
+double dist(double x1, double y1, double x2, double y2) {
+	return (double)sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+}

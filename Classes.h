@@ -19,6 +19,15 @@ using namespace std;
 #define CLASSES_H
 
 //===============================
+//	Boat Struct
+//===============================
+
+struct Boat {
+	double x, y;
+	double theta, omega;
+};
+
+//===============================
 //	EA Class
 //===============================
 
@@ -28,10 +37,15 @@ private:
 	vector<double> fitness;
 	int w;	//Number of weights
 	int p;	//Number of policies
+	int change; //how many weights to change per mutation
 public:
 	void init(int,int);
-	void evaluate();
-
+	void down_select();
+	void repopulate();
+	void mutate(int);
+	void give_fitness(vector<double>);
+	vector<double> get_weights(int);
+	int population();
 };
 
 //===============================
@@ -45,15 +59,19 @@ private:
 	double theta, omega;
 	double beta;			//pitch that the boat needs to be at to go directly to the goal
 	double v;
+	vector<double> fitness;
+	vector<double> input;
+	neural_network NN;
 	Evolution EA;
-	//neural_network NN;
 public:
-	Simulation (int,int);
-	// Simulation (neural_network,int,int);
-	int simulate(double);
-	vector<double> update_input();
+	// Simulation (int,int);
+	Simulation (neural_network,Evolution);
+	void run(Boat);
+	void simulate(double);
+	void update_input();
 	void log(bool); 
 	void calc_beta();
+	bool in_bounds();
 };
 
 // class Simulation {
@@ -68,5 +86,7 @@ public:
 //===============================
 //	Functions
 //===============================
+
+double dist(double,double,double,double);
 
 #endif
