@@ -7,6 +7,7 @@
 void Evolution::init (int wt, int pop) {
 	w = wt;
 	p = pop;
+	change = (int)sqrt(w);
 	vector<double> dummy;
 
 	if (p%2 != 0) p++;
@@ -15,26 +16,70 @@ void Evolution::init (int wt, int pop) {
 		dummy.clear();
 		for (int j = 0; j < w; j++) {
 			dummy.push_back(ZERO_TO_ONE*2-1);
+			// if (i == 0) printf("%.4f\t", dummy[j]);
 		}
+		// if (i == 0) cout << endl;
 		weights.push_back(dummy);
 	}
 	change = (int)sqrt(w);
 }
 
-void Evolution::down_select() {
+void Evolution::down_repop(vector<double> fitness) {
+	vector<int> choices;
+	int a,b;
+	int first, second;
 
-}
+	assert(fitness.size() == p);
 
-void Evolution::repopulate() {
+	for (int i = 0; i < fitness.size(); i++) {
+		choices.push_back(i);
+	}
+	while (choices.size() > 0) {
+		first = rand()%choices.size();
+		do {
+			second = rand()%choices.size();
+		} while (first == second);
+		a = choices[first];
+		b = choices[second];
 
+		if (fitness[a] <= fitness[b]) {
+			weights[b] = weights[a];
+			mutate(b);
+		} else if (fitness[b] < fitness[a]) {
+			weights[a] = weights[b];
+			mutate(b);
+		}
+		if (first > second) {
+			// cout << "a > b\t" << first << ", " << second << endl << endl;
+			choices.erase(choices.begin()+first);
+			choices.erase(choices.begin()+second);
+		} else {
+			// cout << "b > a\t" << second << ", " << first << endl << endl;
+			choices.erase(choices.begin()+second);
+			choices.erase(choices.begin()+first);
+		}
+		// cout << "end" << endl;
+	}
 }
 
 void Evolution::mutate(int index) {
+	// for (int i = 0; i < weights[index].size(); i++) {
+	// 	printf("%.4f\t",weights[index][i]);
+	// }
+	// cout << "\n\n";
 
-}
+	for (int i = 0; i < change; i++) {
+		if (rand()%100 > 5) {
+			weights[index][rand()%w] += (ZERO_TO_ONE-0.5)*0.2;
+		} else {
+			weights[index][rand()%w] += (ZERO_TO_ONE-0.5)*0.5;
+		}
+	}
 
-void Evolution::give_fitness(vector<double> input) {
-	fitness = input;
+	// for (int i = 0; i < weights[index].size(); i++) {
+	// 	printf("%.4f\t",weights[index][i]);
+	// }
+	// cout << "\n==================================\n";
 }
 
 vector<double> Evolution::get_weights(int n) {
@@ -42,7 +87,7 @@ vector<double> Evolution::get_weights(int n) {
 }
 
 int Evolution::population() {
-	return (int) weights.size();
+	return p;
 }
 
 //===============================
@@ -59,7 +104,7 @@ Simulation::Simulation(neural_network nn, Evolution ea) {
 
 }
 
-void Simulation::run(Boat start) {
+void Simulation::run(Boat start, bool see, bool data) {
 	double min = dist(x,y,gx,gy);
 	double distance = min;
 	double u;
@@ -77,7 +122,7 @@ void Simulation::run(Boat start) {
 		fit = 0;
 		w = EA.get_weights(i);
 		do {
-			update_input();
+			update_input(distance);
 			NN.set_vector_input(input);
 			NN.set_weights(w,true);
 			NN.execute();
@@ -87,27 +132,26 @@ void Simulation::run(Boat start) {
 			distance = dist(x,y,gx,gy);
 			if (min > distance) min = distance;
 			time += TIME;
-			if (i == 0) {
+			if (data && i == 0) {
 				log(first);
 				if (first) first = false;
 			}
-		} while (in_bounds() && distance > 2.5 && time < 100);
+		} while (in_bounds() && distance > 2.5 && time < 150);
 		fit = min+time;
-		if (!in_bounds())	{
-			fit += 100;
-			//cout << "OUTSIDE ";
-		} //else if (distance <= 2.5) {
-		// 	cout << "FOUND   ";
-		// } else {
-		// 	cout << "INSIDE  ";
-		// }
-		cout << fit << endl;
+		if (!in_bounds()) fit += 150;
+		if (see) {
+			if (!in_bounds())	{
+				cout << "OUTSIDE ";
+			} else if (distance <= 2.5) {
+				cout << "FOUND   ";
+			} else {
+				cout << "INSIDE  ";
+			}
+			cout << fit << endl;
+		}
 		fitness.push_back(fit);
 	}
-	// assert(n == fitness.size());
-	EA.give_fitness(fitness);
-	EA.down_select();
-	EA.repopulate();
+	EA.down_repop(fitness);
 }
 
 void Simulation::simulate(double u) {
@@ -117,13 +161,6 @@ void Simulation::simulate(double u) {
 	theta += omega*TIME;
 	omega += (u-omega)*TIME/5.0;	//the "5.0" it "T"
 
-	// distance = sqrt(pow(x-gx,2)+pow(y-gy,2));
-
-	// if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
-	// 	state = 1;
-	// } else if (distance <= 2.5) {
-	// 	state = 2;
-	// }
 	while (theta < 0 || theta >= 360) {
 		if (theta < 0) {
 			theta += 360;
@@ -138,53 +175,20 @@ void Simulation::simulate(double u) {
 	}
 }
 
-// int Simulation::simulate(double u) {
-// 	int state = 0;
-// 	double distance = 0;
-
-// 	update_input();
-// 	NN.set_input_vector(input);
-// 	NN.execute();
-// 	u = NN.get_output(0);
-
-// 	x += v*cos(theta*RADIANS)*TIME;
-// 	y += v*sin(theta*RADIANS)*TIME;
-// 	theta += omega*TIME;
-// 	// omega += (u-omega)*TIME/5.0;	//the "5.0" it "T"
-
-// 	distance = sqrt(pow(x-gx,2)+pow(y-gy,2));
-
-// 	if (x < 0 || x > SIZE || y < 0 || y > SIZE) {
-// 		state = 1;
-// 	} else if (distance <= 2.5) {
-// 		state = 2;
-// 	}
-// 	while (theta < 0 || theta >= 360) {
-// 		if (theta < 0) {
-// 			theta += 360;
-// 		} else if (theta >= 360) {
-// 			theta -= 360;
-// 		}
-// 	}
-// 	if (omega > 15) {
-// 		omega = 15;
-// 	} else if (omega < -15) {
-// 		omega = -15;
-// 	}
-
-// 	return state;
-// }
-
-void Simulation::update_input() {
+void Simulation::update_input(double d) {
 	input.clear();
 	double stray = beta-theta;
 
 	if (stray < 0) {
 		stray += 360;
 	}
+	if (stray > 180) {
+		stray -= 360;
+	}
 
-	input.push_back(x);
-	input.push_back(y);
+	// input.push_back(x);
+	// input.push_back(y);
+	input.push_back(d);
 	input.push_back(stray);
 	input.push_back(omega);
 }
@@ -229,4 +233,18 @@ bool Simulation::in_bounds() {
 
 double dist(double x1, double y1, double x2, double y2) {
 	return (double)sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+}
+
+Boat randomize_boat() {
+	Boat b;
+	double angle = ZERO_TO_ONE*360*RADIANS;
+	double radius = SIZE*3/8;
+
+	b.x = radius*cos(angle)+(SIZE/2);
+	b.y = radius*sin(angle)+(SIZE/2);
+	b.theta = ZERO_TO_ONE*360;
+	// b.theta = 0;
+	b.omega = 0;
+
+	return b;
 }

@@ -13,7 +13,7 @@ using namespace std;
 #define ZERO_TO_ONE ((double)rand()/RAND_MAX)
 #define RADIANS ((double)3.1415926535897/180)
 #define TIME 0.2
-#define SIZE 200
+#define SIZE 300
 
 #ifndef CLASSES_H
 #define CLASSES_H
@@ -34,16 +34,14 @@ struct Boat {
 class Evolution {
 private:
 	vector<vector<double>> weights;	//[-1,1]
-	vector<double> fitness;
-	int w;	//Number of weights
-	int p;	//Number of policies
-	int change; //how many weights to change per mutation
+	// vector<double> fitness;
+	int w;			//Number of weights
+	int p;			//Number of policies
+	int change; 	//how many weights to change per mutation
 public:
 	void init(int,int);
-	void down_select();
-	void repopulate();
+	void down_repop(vector<double>);	//A combination of downselecting and repopulating, will also call the mutate function
 	void mutate(int);
-	void give_fitness(vector<double>);
 	vector<double> get_weights(int);
 	int population();
 };
@@ -66,27 +64,19 @@ private:
 public:
 	// Simulation (int,int);
 	Simulation (neural_network,Evolution);
-	void run(Boat);
+	void run(Boat,bool,bool);
 	void simulate(double);
-	void update_input();
+	void update_input(double);
 	void log(bool); 
 	void calc_beta();
 	bool in_bounds();
 };
-
-// class Simulation {
-// private:
-// 	double velocity;
-
-// public:
-// 	Simulation (double);
-// 	void run(Boat,)
-// };
 
 //===============================
 //	Functions
 //===============================
 
 double dist(double,double,double,double);
+Boat randomize_boat();
 
 #endif
