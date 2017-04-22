@@ -29,11 +29,12 @@ int main() {
 	cin >> n;
 	
 	neural_network NN;
-	NN.setup(3,5,1);
-	// NN.set_in_min_max(0.0,(double)SIZE);
-	// NN.set_in_min_max(0.0,(double)SIZE);
-	NN.set_in_min_max(0,max);
+	NN.setup(4,5,1);
+	NN.set_in_min_max(0.0,(double)SIZE);
+	NN.set_in_min_max(0.0,(double)SIZE);
+	// NN.set_in_min_max(0,max);
 	NN.set_in_min_max(-180.0,180.0);
+	// NN.set_in_min_max(0,360.0);
 	NN.set_in_min_max(-15.0,15.0);
 	NN.set_out_min_max(-15.0,15.0);
 	wt = NN.get_number_of_weights();

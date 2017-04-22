@@ -14,6 +14,8 @@ using namespace std;
 #define RADIANS ((double)3.1415926535897/180)
 #define TIME 0.2
 #define SIZE 300
+#define ASSERT true
+#define STICK 2.5
 
 #ifndef CLASSES_H
 #define CLASSES_H
@@ -67,7 +69,7 @@ public:
 	void run(Boat,bool,bool);
 	void simulate(double);
 	void update_input(double);
-	void log(bool); 
+	void log(bool,int); 
 	void calc_beta();
 	bool in_bounds();
 };
@@ -78,5 +80,6 @@ public:
 
 double dist(double,double,double,double);
 Boat randomize_boat();
+string int2str(int,int);
 
 #endif
