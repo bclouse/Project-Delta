@@ -22,6 +22,7 @@ int main() {
 	int n = 50;
 	srand(time(NULL));
 	double max = dist(0,0,SIZE/2,SIZE/2);
+	FILE *fit = fopen("Learning.txt", "w+");
 
 	cout << "What Population size do you want? ";
 	cin >> pop;
@@ -64,7 +65,9 @@ int main() {
 		} else {
 			world.run(b,false,false);
 		}
+		world.log_fit(fit);
 	}
 
+	fclose(fit);
 	return 0;
 }

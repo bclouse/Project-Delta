@@ -70,6 +70,7 @@ public:
 	void simulate(double);
 	void update_input(double);
 	void log(bool,int); 
+	void log_fit(FILE*);
 	void calc_beta();
 	bool in_bounds();
 };

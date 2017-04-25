@@ -21,7 +21,8 @@ void Evolution::init (int wt, int pop) {
 		// if (i == 0) cout << endl;
 		weights.push_back(dummy);
 	}
-	change = (int)sqrt(w);
+	// change = (int)sqrt(w);
+	change = w/4;
 }
 
 void Evolution::down_repop(vector<double> fitness) {
@@ -225,7 +226,7 @@ void Simulation::log(bool first,int index) {
 	} else {
 		fp = fopen(str,"a");
 	}
-	fprintf(fp,"%8f\t%8f\t%8f\n", x,y,stray);
+	fprintf(fp,"%8f\t%8f\t%8f\n", x,y,omega);
 	fclose(fp);
 }
 
@@ -234,6 +235,19 @@ bool Simulation::in_bounds() {
 		return false;
 	}
 	return true;
+}
+
+void Simulation::log_fit(FILE *fit) {
+	int min = 0, max = 0;
+	double avg = fitness[0];
+
+	for(int i = 1; i < fitness.size(); i++) {
+		if (fitness[min] > fitness[i]) min = i;
+		if (fitness[max] < fitness[i]) max = i;
+		avg += fitness[i];
+	}
+	avg /= fitness.size();
+	fprintf(fit,"%8f\t%8f\t%8f\n", fitness[min], avg, fitness[max]);
 }
 
 //===============================
@@ -255,7 +269,8 @@ Boat randomize_boat() {
 
 	b.x = radius*cos(angle)+(SIZE/2);
 	b.y = radius*sin(angle)+(SIZE/2);
-	b.theta = theta+(ZERO_TO_ONE*90)-45;
+	b.theta = ZERO_TO_ONE*360;
+	// b.theta = theta+(ZERO_TO_ONE*90)-45;
 	// b.theta = 0;
 	b.omega = 0;
 
