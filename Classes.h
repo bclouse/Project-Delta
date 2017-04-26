@@ -13,9 +13,10 @@ using namespace std;
 #define ZERO_TO_ONE ((double)rand()/RAND_MAX)
 #define RADIANS ((double)3.1415926535897/180)
 #define TIME 0.2
-#define SIZE 300
+#define SIZE 500
 #define ASSERT true
-#define STICK 2.5
+#define STICK 5
+#define DURATION 350
 
 #ifndef CLASSES_H
 #define CLASSES_H
@@ -58,6 +59,7 @@ private:
 	double x, y;
 	double theta, omega;
 	double beta;			//pitch that the boat needs to be at to go directly to the goal
+	double stray;
 	double v;
 	vector<double> fitness;
 	vector<double> input;
@@ -68,8 +70,8 @@ public:
 	Simulation (neural_network,Evolution);
 	void run(Boat,bool,bool);
 	void simulate(double);
-	void update_input(double);
-	void log(bool,int); 
+	void update_input(double,double);
+	void log(FILE*); 
 	void log_fit(FILE*);
 	void calc_beta();
 	bool in_bounds();

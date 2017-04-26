@@ -16,13 +16,15 @@
 using namespace std;
 
 int main() {
-	bool first = true;
+	bool use_boat;
+	char c;
 	int wt;
 	int pop = 20;
 	int n = 50;
-	srand(time(NULL));
 	double max = dist(0,0,SIZE/2,SIZE/2);
 	FILE *fit = fopen("Learning.txt", "w+");
+
+	srand(time(NULL));
 
 	cout << "What Population size do you want? ";
 	cin >> pop;
@@ -30,14 +32,14 @@ int main() {
 	cin >> n;
 	
 	neural_network NN;
-	NN.setup(4,5,1);
-	NN.set_in_min_max(0.0,(double)SIZE);
-	NN.set_in_min_max(0.0,(double)SIZE);
-	// NN.set_in_min_max(0,max);
-	NN.set_in_min_max(-180.0,180.0);
-	// NN.set_in_min_max(0,360.0);
-	NN.set_in_min_max(-15.0,15.0);
-	NN.set_out_min_max(-15.0,15.0);
+	NN.setup(3,5,1);
+	// NN.set_in_min_max(0.0,SIZE);		//x
+	// NN.set_in_min_max(0.0,SIZE);		//y
+	// NN.set_in_min_max(0,360.0);		//theta
+	NN.set_in_min_max(0,max);			//distance
+	NN.set_in_min_max(0.0,180.0);		//stray
+	NN.set_in_min_max(-15.0,15.0);	//omega
+	NN.set_out_min_max(-15.0,15.0);	//OUTPUT
 	wt = NN.get_number_of_weights();
 	// cout << wt << "\n\n";
 
@@ -47,11 +49,20 @@ int main() {
 	Simulation world(NN,EA);
 
 	Boat b;
+	do {
 	b = randomize_boat();
-	// b.x = SIZE/4;	b.y = SIZE/4;
-	// b.theta = 0;	b.omega = 0;
+	printf("Boat is located at %.1f, %.1f at angle %.1f\nIs this ok? (Y or N) ", b.x, b.y, b.theta);
+		cin >> c;
+		while (c != 'Y' && c != 'N') {
+			printf("Invalid option! Choose Y or N! ");
+			cin >> c;
+		}
+		if (c == 'Y') 	use_boat = true;
+		else				use_boat = false;
+	} while (!use_boat);
 
 	for (int i = 0; i < n; i++) {
+
 		if ((i+1)%10 == 0) { 
 			printf("Iteration #%d\n", i+1);
 		}

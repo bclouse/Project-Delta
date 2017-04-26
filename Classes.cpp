@@ -102,18 +102,21 @@ Simulation::Simulation(neural_network nn, Evolution ea) {
 	x = SIZE/4; 	y = SIZE/4*3;
 	theta = 0; 		omega = 0;
 	v = 3;
-
 }
 
 void Simulation::run(Boat start, bool see, bool data) {
 	double min = dist(x,y,gx,gy);
 	double distance = min;
+	double previous = min;
 	double u;
 	double time;
 	double fit;
 	int n = EA.population();
 	bool first = true;
 	vector<double> w;
+	FILE *path;
+	char str[] = "assests//path000.txt\0";	//13,14,15
+	string num;
 
 	fitness.clear();
 	for (int i = 0; i < n; i++) {
@@ -123,24 +126,42 @@ void Simulation::run(Boat start, bool see, bool data) {
 		fit = 0;
 		w = EA.get_weights(i);
 		first = true;
+		distance = previous = min;
+
+		num = int2str(i+1,3);
+	
+		str[13] = num[0];
+		str[14] = num[1];
+		str[15] = num[2];
+		
+		path = fopen(str,"w+");
+		calc_beta();
+		stray = beta-theta;
+		if (stray < 0) {
+			stray += 360;
+		}
+		if (stray > 180) {
+			stray = 360 - stray;
+		}
 		do {
-			update_input(distance);
+			update_input(distance,previous);
 			NN.set_vector_input(input);
 			NN.set_weights(w,ASSERT);
 			NN.execute();
 			u = NN.get_output(0);
 			simulate(u);
 			calc_beta();
+			previous = distance;
 			distance = dist(x,y,gx,gy);
 			// if (min > distance) min = distance;
 			time += TIME;
 			if (data) {
-				log(first,i);
+				log(path);
 				if (first) first = false;
 			}
-		} while (in_bounds() && distance > 2.5 && time < 200);
-		fit = distance+time;
-		if (!in_bounds()) fit += 200;
+		} while (in_bounds() && distance > 2.5 && time < DURATION);
+		fit = distance+(time/2);
+		if (!in_bounds()) fit += DURATION/2;
 		if (see) {
 			printf("%3d) ", i+1);
 			if (!in_bounds())	{
@@ -153,6 +174,7 @@ void Simulation::run(Boat start, bool see, bool data) {
 			cout << fit << endl;
 		}
 		fitness.push_back(fit);
+		fclose(path);
 	}
 	EA.down_repop(fitness);
 }
@@ -178,21 +200,21 @@ void Simulation::simulate(double u) {
 	}
 }
 
-void Simulation::update_input(double d) {
+void Simulation::update_input(double d,double prev) {
 	input.clear();
-	double stray = beta-theta;
+	stray = beta-theta;
 
 	if (stray < 0) {
 		stray += 360;
 	}
 	if (stray > 180) {
-		stray -= 360;
+		stray = 360 - stray;
 	}
 
-	input.push_back(x);
-	input.push_back(y);
+	// input.push_back(x);
+	// input.push_back(y);
 	// input.push_back(theta);
-	// input.push_back(d);
+	input.push_back(d);
 	input.push_back(stray);
 	input.push_back(omega);
 }
@@ -208,26 +230,8 @@ void Simulation::calc_beta() {
 	// printf("%6f\n", beta);
 }
 
-void Simulation::log(bool first,int index) {
-	FILE *fp;
-	double stray = beta-theta;
-	char str[] = "assests//path000.txt\0";	//13,14,15
-	string num = int2str(index+1,3);
-
-	str[13] = num[0];
-	str[14] = num[1];
-	str[15] = num[2];
-
-	if (stray < 0) {
-		stray += 360;
-	}
-	if (first) {
-		fp = fopen(str,"w+");
-	} else {
-		fp = fopen(str,"a");
-	}
-	fprintf(fp,"%8f\t%8f\t%8f\n", x,y,omega);
-	fclose(fp);
+void Simulation::log(FILE *path) {
+	fprintf(path,"%8f\t%8f\t%8f\t%8f\n", x,y,omega,stray);
 }
 
 bool Simulation::in_bounds() {
