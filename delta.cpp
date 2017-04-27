@@ -51,7 +51,7 @@ int main() {
 	Boat b;
 	do {
 	b = randomize_boat();
-	printf("Boat is located at %.1f, %.1f at angle %.1f\nIs this ok? (Y or N) ", b.x, b.y, b.theta);
+	printf("\nBoat is located at %.1f, %.1f at angle %.1f\nIs this ok? (Y or N) ", b.x, b.y, b.theta);
 		cin >> c;
 		while (c != 'Y' && c != 'N') {
 			printf("Invalid option! Choose Y or N! ");
@@ -60,11 +60,10 @@ int main() {
 		if (c == 'Y') 	use_boat = true;
 		else				use_boat = false;
 	} while (!use_boat);
-
 	for (int i = 0; i < n; i++) {
 
 		if ((i+1)%10 == 0) { 
-			printf("Iteration #%d\n", i+1);
+			printf("Generation #%d\n", i+1);
 		}
 		// b = randomize_boat();
 		if (i == n-1) {

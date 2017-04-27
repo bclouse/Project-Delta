@@ -126,15 +126,18 @@ void Simulation::run(Boat start, bool see, bool data) {
 		fit = 0;
 		w = EA.get_weights(i);
 		first = true;
-		distance = previous = min;
+		distance = min;
+		previous = min;
 
-		num = int2str(i+1,3);
-	
-		str[13] = num[0];
-		str[14] = num[1];
-		str[15] = num[2];
+		if (data) {
+			num = int2str(i+1,3);
 		
-		path = fopen(str,"w+");
+			str[13] = num[0];
+			str[14] = num[1];
+			str[15] = num[2];
+
+			path = fopen(str,"w+");
+		}
 		calc_beta();
 		stray = beta-theta;
 		if (stray < 0) {
@@ -160,6 +163,7 @@ void Simulation::run(Boat start, bool see, bool data) {
 				if (first) first = false;
 			}
 		} while (in_bounds() && distance > 2.5 && time < DURATION);
+		// cout << "Outside loop" << endl;
 		fit = distance+(time/2);
 		if (!in_bounds()) fit += DURATION/2;
 		if (see) {
@@ -173,8 +177,10 @@ void Simulation::run(Boat start, bool see, bool data) {
 			}
 			cout << fit << endl;
 		}
+		// cout << "add to fitness" << endl;
 		fitness.push_back(fit);
-		fclose(path);
+		
+		if (data) fclose(path);
 	}
 	EA.down_repop(fitness);
 }
