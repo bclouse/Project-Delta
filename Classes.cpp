@@ -64,23 +64,18 @@ void Evolution::down_repop(vector<double> fitness) {
 }
 
 void Evolution::mutate(int index) {
-	// for (int i = 0; i < weights[index].size(); i++) {
-	// 	printf("%.4f\t",weights[index][i]);
-	// }
-	// cout << "\n\n";
+	int in;
 
 	for (int i = 0; i < change; i++) {
+		in = rand()%w;
 		if (rand()%100 > 10) {
-			weights[index][rand()%w] += (ZERO_TO_ONE-0.5)*0.5;
+			weights[index][in] += (ZERO_TO_ONE-0.5)*0.5;
 		} else {
-			weights[index][rand()%w] += (ZERO_TO_ONE-0.5);
+			weights[index][in] += (ZERO_TO_ONE-0.5);
 		}
+		if (weights[index][in] > 1) weights[index][in] = 1;
+		else if (weights[index][in] < -1) weights[index][in] = -1;
 	}
-
-	// for (int i = 0; i < weights[index].size(); i++) {
-	// 	printf("%.4f\t",weights[index][i]);
-	// }
-	// cout << "\n==================================\n";
 }
 
 vector<double> Evolution::get_weights(int n) {
@@ -146,6 +141,7 @@ void Simulation::run(Boat start, bool see, bool data) {
 		if (stray > 180) {
 			stray = 360 - stray;
 		}
+		//RUNNING SIMULATION
 		do {
 			update_input(distance,previous);
 			NN.set_vector_input(input);
@@ -162,7 +158,8 @@ void Simulation::run(Boat start, bool see, bool data) {
 				log(path);
 				if (first) first = false;
 			}
-		} while (in_bounds() && distance > 2.5 && time < DURATION);
+		} while (in_bounds() && !found_goal() && time < DURATION);
+		
 		// cout << "Outside loop" << endl;
 		fit = distance+(time/2);
 		if (!in_bounds()) fit += DURATION/2;
@@ -260,6 +257,11 @@ void Simulation::log_fit(FILE *fit) {
 	fprintf(fit,"%8f\t%8f\t%8f\n", fitness[min], avg, fitness[max]);
 }
 
+bool Simulation::found_goal() {
+	if (dist(x,y,gx,gy) <= 2.5) return true;
+	else return false;
+}
+
 //===============================
 //	Functions
 //===============================
@@ -268,7 +270,7 @@ double dist(double x1, double y1, double x2, double y2) {
 	return (double)sqrt(pow(x1-x2,2)+pow(y1-y2,2));
 }
 
-Boat randomize_boat() {
+Boat randomize_boat(bool print) {
 	Boat b;
 	double theta = ZERO_TO_ONE*360;
 	double angle = theta*RADIANS;
@@ -283,6 +285,10 @@ Boat randomize_boat() {
 	// b.theta = theta+(ZERO_TO_ONE*90)-45;
 	// b.theta = 0;
 	b.omega = 0;
+	angle = (angle/RADIANS) - 180;
+	if (angle < 0) angle += 360;
+	printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
+	// printf("x: %.1f\ty: %.1f\n", b.x, b.y);
 
 	return b;
 }

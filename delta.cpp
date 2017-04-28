@@ -28,7 +28,7 @@ int main() {
 
 	cout << "What Population size do you want? ";
 	cin >> pop;
-	cout << "How many iterations? ";
+	cout << "How many generations? ";
 	cin >> n;
 	
 	neural_network NN;
@@ -50,8 +50,8 @@ int main() {
 
 	Boat b;
 	do {
-	b = randomize_boat();
-	printf("\nBoat is located at %.1f, %.1f at angle %.1f\nIs this ok? (Y or N) ", b.x, b.y, b.theta);
+	b = randomize_boat(true);
+	printf("Is this ok? (Y or N) ");
 		cin >> c;
 		while (c != 'Y' && c != 'N') {
 			printf("Invalid option! Choose Y or N! ");
@@ -60,6 +60,9 @@ int main() {
 		if (c == 'Y') 	use_boat = true;
 		else				use_boat = false;
 	} while (!use_boat);
+	cout << endl;
+
+
 	for (int i = 0; i < n; i++) {
 
 		if ((i+1)%10 == 0) { 
@@ -69,9 +72,6 @@ int main() {
 		if (i == n-1) {
 			cout << endl;
 			world.run(b,true,true);
-		// } else if (i == 0) {
-		// 	world.run(b,true,false);
-		// 	cout << endl;
 		} else {
 			world.run(b,false,false);
 		}

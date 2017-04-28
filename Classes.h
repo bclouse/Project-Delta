@@ -17,6 +17,7 @@ using namespace std;
 #define ASSERT true
 #define STICK 5
 #define DURATION 350
+#define SPACING 2.5
 
 #ifndef CLASSES_H
 #define CLASSES_H
@@ -75,6 +76,7 @@ public:
 	void log_fit(FILE*);
 	void calc_beta();
 	bool in_bounds();
+	bool found_goal();
 };
 
 //===============================
@@ -82,7 +84,7 @@ public:
 //===============================
 
 double dist(double,double,double,double);
-Boat randomize_boat();
+Boat randomize_boat(bool);
 string int2str(int,int);
 
 #endif
