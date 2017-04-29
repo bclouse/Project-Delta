@@ -24,6 +24,7 @@ int main() {
 	int count = 1;
 	int spacing = 10;
 	bool log_spacing = true;
+	bool random_boat = false;
 	double max = dist(0,0,SIZE/2,SIZE/2);
 	FILE *fit = fopen("assests//Learning.txt", "w+");
 	char given[] = "path_over_time//step0.txt";	//21
@@ -68,37 +69,49 @@ int main() {
 	} while (!use_boat);
 	cout << endl;
 
+	for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < n; i++) {
 
-	for (int i = 0; i < n; i++) {
-
-		if ((i+1)%10 == 0) { 
-			printf("Generation #%d\n", i+1);
-		}
-		// b = randomize_boat();
-		if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing)) {
-			cout << endl;
-			world.run(b,true,true);
-			given[20] = '0'+count;
-			count++;
-			world.log_best(given);
-			cout << endl;
-		} else {
-			world.run(b,false,false);
-		}
-		world.log_fit(fit);
-		if (((i+1)%spacing == 0 && log_spacing) && (i != n-1)) {
-			cout << "Do you want to continue? (Y or N) ";
-			cin >> c;
-			while (c != 'Y' && c != 'N' && c != 'S') {
-				printf("Invalid option! Choose Y or N! ");
-				cin >> c;
+			if ((i+1)%10 == 0) { 
+				printf("Generation #%d\n", i+1);
 			}
-			if (c == 'N') break;
-			else if (c == 'S') log_spacing = false;
-			cout << endl;
+			if (random_boat) b = randomize_boat(false);
+			if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing)) {
+				cout << endl;
+				world.run(b,true,true);
+				given[20] = '0'+count;
+				count++;
+				world.log_best(given);
+				cout << endl;
+			} else {
+				world.run(b,false,false);
+			}
+			if (!random_boat) world.log_fit(fit);
+			if (((i+1)%spacing == 0 && log_spacing) && (i != n-1)) {
+				cout << "Do you want to continue? \nY or N to answer or S to skip storing the best paths over time. ";
+				cin >> c;
+				while (c != 'Y' && c != 'N' && c != 'S') {
+					printf("Invalid option! Choose Y or N! ");
+					cin >> c;
+				}
+				if (c == 'N') break;
+				else if (c == 'S') log_spacing = false;
+				cout << endl;
+			}
 		}
+		if (j == 0) fclose(fit);
+		else break;
+		cout << "\nDo you want to randomize the boat location now? (Y or N) ";
+		cin >> c;
+		while (c != 'Y' && c != 'N') {
+			printf("Invalid option! Choose Y or N! ");
+			cin >> c;
+		}
+		if (c == 'N') break;
+		random_boat= true;
+		log_spacing = false;
+		cout << "How many Generations? ";
+		cin >> n;
 	}
-
-	fclose(fit);
 	return 0;
 }

@@ -315,8 +315,10 @@ Boat randomize_boat(bool print) {
 	angle = (angle/RADIANS) - 180;
 	if (angle < 0) angle += 360;
 	// printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
-	printf("\nDifference in angle is %.1f\n", angle-b.theta);
-	printf("x: %.1f\ty: %.1f\n", b.x, b.y);
+	if (print) {
+		printf("\nDifference in angle is %.1f\n", angle-b.theta);
+		printf("x: %.1f\ty: %.1f\n", b.x, b.y);
+	}
 
 	return b;
 }
