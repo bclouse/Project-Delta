@@ -73,8 +73,8 @@ void Evolution::mutate(int index) {
 		} else {
 			weights[index][in] += (ZERO_TO_ONE-0.5);
 		}
-		if (weights[index][in] > 1) weights[index][in] = 1;
-		else if (weights[index][in] < -1) weights[index][in] = -1;
+		// if (weights[index][in] > 1) weights[index][in] = 1;
+		// else if (weights[index][in] < -1) weights[index][in] = -1;
 	}
 }
 
@@ -262,6 +262,33 @@ bool Simulation::found_goal() {
 	else return false;
 }
 
+void Simulation::log_best(char given[]) {
+	int index = 0;
+	string num;
+	char str[] = "assests//path000.txt\0";
+	char c = 0;
+	FILE *original;
+	FILE *fp = fopen(given,"w+");
+
+
+	for (int i = 1; i < fitness.size(); i++) {
+		if (fitness[index] > fitness[i]) index = i;
+	}
+
+	num = int2str(index+1,3);	
+	str[13] = num[0];
+	str[14] = num[1];
+	str[15] = num[2];
+	original = fopen(str,"r");
+
+	while(!feof(original)) {
+		fscanf(original, "%c", &c);
+		fprintf(fp, "%c", c);
+	}
+	fclose(original);
+	fclose(fp);
+}
+
 //===============================
 //	Functions
 //===============================
@@ -287,8 +314,9 @@ Boat randomize_boat(bool print) {
 	b.omega = 0;
 	angle = (angle/RADIANS) - 180;
 	if (angle < 0) angle += 360;
-	printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
-	// printf("x: %.1f\ty: %.1f\n", b.x, b.y);
+	// printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
+	printf("\nDifference in angle is %.1f\n", angle-b.theta);
+	printf("x: %.1f\ty: %.1f\n", b.x, b.y);
 
 	return b;
 }
@@ -309,3 +337,10 @@ string int2str(int num, int size) {
 
 	return output;
 }
+
+// void copy_file(FILE *in, FILE *out) {
+// 	while (!feof(in)) {
+// 		fscanf(in, "%c", &c);
+// 		fprintf(out, "%c", c);
+// 	}
+// }

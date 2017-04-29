@@ -77,6 +77,7 @@ public:
 	void calc_beta();
 	bool in_bounds();
 	bool found_goal();
+	void log_best(char given[]);
 };
 
 //===============================

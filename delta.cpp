@@ -21,15 +21,21 @@ int main() {
 	int wt;
 	int pop = 20;
 	int n = 50;
+	int count = 1;
+	int spacing = 10;
+	bool log_spacing = true;
 	double max = dist(0,0,SIZE/2,SIZE/2);
-	FILE *fit = fopen("Learning.txt", "w+");
+	FILE *fit = fopen("assests//Learning.txt", "w+");
+	char given[] = "path_over_time//step0.txt";	//21
 
 	srand(time(NULL));
 
 	cout << "What Population size do you want? ";
 	cin >> pop;
-	cout << "How many generations? ";
+	cout << "What is the maximum number of generations? ";
 	cin >> n;
+	cout << "What generation spacing do you want to log the best policy? ";
+	cin >> spacing;
 	
 	neural_network NN;
 	NN.setup(3,5,1);
@@ -69,13 +75,28 @@ int main() {
 			printf("Generation #%d\n", i+1);
 		}
 		// b = randomize_boat();
-		if (i == n-1) {
+		if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing)) {
 			cout << endl;
 			world.run(b,true,true);
+			given[20] = '0'+count;
+			count++;
+			world.log_best(given);
+			cout << endl;
 		} else {
 			world.run(b,false,false);
 		}
 		world.log_fit(fit);
+		if (((i+1)%spacing == 0 && log_spacing) && (i != n-1)) {
+			cout << "Do you want to continue? (Y or N) ";
+			cin >> c;
+			while (c != 'Y' && c != 'N' && c != 'S') {
+				printf("Invalid option! Choose Y or N! ");
+				cin >> c;
+			}
+			if (c == 'N') break;
+			else if (c == 'S') log_spacing = false;
+			cout << endl;
+		}
 	}
 
 	fclose(fit);
