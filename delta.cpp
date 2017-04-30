@@ -57,7 +57,7 @@ int main() {
 
 	Boat b;
 	do {
-	b = randomize_boat(true);
+	b = randomize_boat(true,false);
 	printf("Is this ok? (Y or N) ");
 		cin >> c;
 		while (c != 'Y' && c != 'N') {
@@ -75,8 +75,14 @@ int main() {
 			if ((i+1)%10 == 0) { 
 				printf("Generation #%d\n", i+1);
 			}
-			if (random_boat) b = randomize_boat(false);
-			if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing)) {
+			if (random_boat) {
+				if (i != n-1) {
+					b = randomize_boat(false,false);
+				} else {
+					b = randomize_boat(false,true);
+				}
+			}
+			if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing) || random_boat) {
 				cout << endl;
 				world.run(b,true,true);
 				given[20] = '0'+count;
@@ -110,7 +116,12 @@ int main() {
 		if (c == 'N') break;
 		random_boat= true;
 		log_spacing = false;
-		cout << "How many Generations? ";
+		count = 1;
+		given[16] = 'p';
+		given[17] = 'a';
+		given[18] = 't';
+		given[19] = 'h';
+		cout << "How many Generations? (less than 10) ";
 		cin >> n;
 	}
 	return 0;

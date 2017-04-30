@@ -85,7 +85,7 @@ public:
 //===============================
 
 double dist(double,double,double,double);
-Boat randomize_boat(bool);
+Boat randomize_boat(bool,bool);
 string int2str(int,int);
 
 #endif

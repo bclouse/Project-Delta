@@ -297,7 +297,7 @@ double dist(double x1, double y1, double x2, double y2) {
 	return (double)sqrt(pow(x1-x2,2)+pow(y1-y2,2));
 }
 
-Boat randomize_boat(bool print) {
+Boat randomize_boat(bool print,bool face_away) {
 	Boat b;
 	double theta = ZERO_TO_ONE*360;
 	double angle = theta*RADIANS;
@@ -308,7 +308,13 @@ Boat randomize_boat(bool print) {
 
 	b.x = radius*cos(angle)+(SIZE/2);
 	b.y = radius*sin(angle)+(SIZE/2);
-	b.theta = ZERO_TO_ONE*360;
+	if (face_away) {
+		b.theta = angle+((ZERO_TO_ONE-0.5)*90);
+		if (b.theta < 0) b.theta += 360;
+		else if (b.theta >= 360) b.theta -= 360;
+	} else {
+		b.theta = ZERO_TO_ONE*360;
+	}
 	// b.theta = theta+(ZERO_TO_ONE*90)-45;
 	// b.theta = 0;
 	b.omega = 0;
@@ -316,7 +322,7 @@ Boat randomize_boat(bool print) {
 	if (angle < 0) angle += 360;
 	// printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
 	if (print) {
-		printf("\nDifference in angle is %.1f\n", angle-b.theta);
+		printf("\nDifference in angle is %.1f and theta is %.1f\n", angle-b.theta,b.theta);
 		printf("x: %.1f\ty: %.1f\n", b.x, b.y);
 	}
 
