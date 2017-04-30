@@ -45,7 +45,7 @@ void Evolution::down_repop(vector<double> fitness) {
 
 		if (fitness[a] <= fitness[b]) {
 			weights[b] = weights[a];
-			mutate(b);
+			mutate(a);
 		} else if (fitness[b] < fitness[a]) {
 			weights[a] = weights[b];
 			mutate(b);
@@ -246,9 +246,9 @@ bool Simulation::in_bounds() {
 
 void Simulation::log_fit(FILE *fit) {
 	int min = 0, max = 0;
-	double avg = fitness[0];
+	double avg = 0;
 
-	for(int i = 1; i < fitness.size(); i++) {
+	for(int i = 0; i < fitness.size(); i++) {
 		if (fitness[min] > fitness[i]) min = i;
 		if (fitness[max] < fitness[i]) max = i;
 		avg += fitness[i];

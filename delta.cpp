@@ -22,6 +22,7 @@ int main() {
 	int pop = 20;
 	int n = 50;
 	int count = 1;
+	int new_gen = 1;
 	int spacing = 10;
 	bool log_spacing = true;
 	bool random_boat = false;
@@ -82,7 +83,7 @@ int main() {
 					b = randomize_boat(false,true);
 				}
 			}
-			if (i == n-1 || i == 0 || ((i+1)%spacing == 0 && log_spacing) || random_boat) {
+			if (i >= n-new_gen || i == 0 || ((i+1)%spacing == 0 && log_spacing)) {//} || random_boat) {
 				cout << endl;
 				world.run(b,true,true);
 				given[20] = '0'+count;
@@ -121,8 +122,10 @@ int main() {
 		given[17] = 'a';
 		given[18] = 't';
 		given[19] = 'h';
-		cout << "How many Generations? (less than 10) ";
+		cout << "How many Generations? ";
 		cin >> n;
+		cout << "How many trials do you want to log at the end? ";
+		cin >> new_gen;
 	}
 	return 0;
 }
