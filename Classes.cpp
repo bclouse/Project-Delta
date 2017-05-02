@@ -258,8 +258,12 @@ void Simulation::log_fit(FILE *fit) {
 }
 
 bool Simulation::found_goal() {
-	if (dist(x,y,gx,gy) <= 2.5) return true;
-	else return false;
+	bool found = false;
+	if (dist(x,y,gx,gy) <= 2.5) {
+		found = true;
+		assert(found);
+	}
+	return found;
 }
 
 void Simulation::log_best(char given[]) {
