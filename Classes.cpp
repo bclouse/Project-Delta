@@ -133,10 +133,10 @@ void Simulation::run(Boat start, bool see, bool data) {
 
 			path = fopen(str,"w+");
 		}
-		calc_beta();
-		stray = beta-theta;
-		if (stray < 0) {
-			stray += 360;
+		calc_beta();									//Comments for Sierra: beta is the angle that the agent needs to be looking at
+		stray = beta-theta;							//		and theta is the angle that the boat is currently looking at.
+		if (stray < 0) {								//These next few lines of code confine the "stray" angle to between 0 and 180
+			stray += 360;								//"calc_beta()" can be found on line 227
 		}
 		if (stray > 180) {
 			stray = 360 - stray;
@@ -163,6 +163,7 @@ void Simulation::run(Boat start, bool see, bool data) {
 		// cout << "Outside loop" << endl;
 		fit = distance+(time/2);
 		if (!in_bounds()) fit += DURATION/2;
+		assert(fit > 0);																			//MR_4
 		if (see) {
 			printf("%3d) ", i+1);
 			if (!in_bounds())	{
@@ -220,13 +221,14 @@ void Simulation::update_input(double d,double prev) {
 	input.push_back(d);
 	input.push_back(stray);
 	input.push_back(omega);
+	assert(1);																						//MR_3
 }
 
 void Simulation::calc_beta() {
-	beta = atan((y-gy)/(x-gx))/RADIANS;
+	beta = atan((y-gy)/(x-gx))/RADIANS;					//For Sierra: this is just a basic trig calculation
 	// printf("%6f\t", beta);
-	if (x > gx) {
-		beta += 180;
+	if (x > gx) {												//Unfortunately, atan has an output range of -90 to 90 so
+		beta += 180;											//		these next few lines confine it to between 0 and 360
 	} else if (x < gx && y > gx) {
 		beta += 360;
 	}
@@ -261,7 +263,7 @@ bool Simulation::found_goal() {
 	bool found = false;
 	if (dist(x,y,gx,gy) <= 2.5) {
 		found = true;
-		assert(found);
+		assert(found);																				//MR_2
 	}
 	return found;
 }
@@ -324,7 +326,7 @@ Boat randomize_boat(bool print,bool face_away) {
 	b.omega = 0;
 	angle = (angle/RADIANS) - 180;
 	if (angle < 0) angle += 360;
-	// printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
+	printf("\nAngle to the goal is %.1f. Theta is %.1f\n",angle,b.theta);
 	if (print) {
 		printf("\nDifference in angle is %.1f and theta is %.1f\n", angle-b.theta,b.theta);
 		printf("x: %.1f\ty: %.1f\n", b.x, b.y);

@@ -57,6 +57,8 @@ int main() {
 	Simulation world(NN,EA);
 
 	Boat b;
+	// b.x = 50; b.y = 250;
+	// b.theta = 0;
 	do {
 	b = randomize_boat(true,false);
 	printf("Is this ok? (Y or N) ");
